@@ -32,7 +32,7 @@ export default function AppRoutes() {
         <Route path="/auth/callback" element={<AuthCallback />} />
 
         {/* Default redirect */}
-        <Route path="*" element={<Navigate to="/todos" replace />} />
+        <Route path="*" element={<Navigate to="/login" replace />} />
         </Routes>
         </>
     );
