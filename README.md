@@ -95,3 +95,6 @@ AI assisted development, but all design decisions were implemented manually.
 ## Author
 
 Built by Subodh R Pataki
+
+## Live Demo
+https://your-vercel-project-name.vercel.app
