@@ -97,4 +97,4 @@ AI assisted development, but all design decisions were implemented manually.
 Built by Subodh R Pataki
 
 ## Live Demo
-[https://your-vercel-project-name.vercel.app](https://auth-todo-psi.vercel.app/)
+[https://auth-todo-psi.vercel.app/](https://auth-todo-psi.vercel.app/)
