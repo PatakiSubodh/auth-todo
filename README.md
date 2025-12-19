@@ -1,16 +1,97 @@
-# React + Vite
+# Authenticated Todo App
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A secure, modern Todo application built with React and Supabase. Users can sign up, log in, and manage their personal tasks with soft delete, filters, and clean UI feedback.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Features
 
-## React Compiler
+- Email-based authentication (Signup, Login, Logout)
+- Protected routes (only logged-in users can access todos)
+- Add, edit, and delete tasks
+- Soft delete with restore option
+- Permanent delete with confirmation
+- Priority and status filters
+- Search tasks by title
+- Toast notifications for all major actions
+- Responsive and clean UI
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+---
 
-## Expanding the ESLint configuration
+## Tech Stack
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+- Frontend: React (Vite)
+- Styling: Tailwind CSS
+- UI Components: ShadCN UI
+- Routing: React Router
+- Backend & Auth: Supabase
+- Icons: Lucide React
+- Deployment: Vercel
+
+---
+
+## Setup Instructions
+
+1. Clone the repository  
+   git clone <your-repo-url>  
+   cd <project-folder>
+
+2. Install dependencies  
+   npm install
+
+3. Create a Supabase project  
+   - Enable Email authentication  
+   - Create a `todos` table with user_id relation
+
+4. Add environment variables  
+   Create a `.env` file:
+   VITE_SUPABASE_URL=your_supabase_url  
+   VITE_SUPABASE_ANON_KEY=your_supabase_anon_key  
+
+5. Run the app locally  
+   npm run dev
+
+6. Build for production  
+   npm run build
+
+---
+
+## Database Schema (Todos)
+
+- id (uuid)
+- title (text)
+- description (text)
+- priority (low | medium | high)
+- status (pending | completed)
+- is_deleted (boolean)
+- user_id (uuid)
+- created_at (timestamp)
+
+---
+
+## Future Improvements
+
+- Due dates and reminders
+- Drag and drop task ordering
+- Task categories / tags
+- AI-powered task suggestions or chat to tasks
+- Graphs for productivity tracking
+- Theme
+
+---
+
+## AI Usage Note
+
+AI was used to:
+- Refine component structure and folder organization
+- Improve UX decisions like soft delete flow and toasts
+- Generate clean, readable code patterns
+- Speed up debugging and edge-case handling
+
+AI assisted development, but all design decisions were implemented manually.
+
+---
+
+## Author
+
+Built by Subodh R Pataki
