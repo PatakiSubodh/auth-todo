@@ -98,11 +98,56 @@ const TodosPage = () => {
 
   const sortTodos = (todos) => {
     return [...todos].sort((a, b) => {
+      // 1. Deleted items always go to the bottom
       if (a.is_deleted !== b.is_deleted) return a.is_deleted ? 1 : -1;
-      if (a.is_complete === b.is_complete) return new Date(b.created_at) - new Date(a.created_at);
-      return a.is_complete ? 1 : -1;
+
+      // 2. Completed items always go below Active items
+      if (a.is_complete !== b.is_complete) return a.is_complete ? 1 : -1;
+
+      // 3. If both are ACTIVE, sort by 'position' (Ascending: 0, 1000, 2000...)
+      if (!a.is_complete && !b.is_complete) {
+          // If 'position' is null (old data), fallback to 'created_at'
+          if (a.position === null || b.position === null) {
+                return new Date(b.created_at) - new Date(a.created_at);
+          }
+          return (a.position || 0) - (b.position || 0);
+      }
+
+      // 4. If both are COMPLETED, keep sorting by Date (Newest first)
+      return new Date(b.created_at) - new Date(a.created_at);
     });
   };
+
+  const handleReorder = async (newActiveTodos) => {
+    // 1. Get the items that were NOT part of the drag (Completed or Deleted)
+    const otherTodos = todos.filter(t => t.is_complete || t.is_deleted);
+    
+    // 2. Combine: Put new active order first, then the others
+    const newFullList = [...newActiveTodos, ...otherTodos];
+
+    // 3. Update UI immediately
+    setTodos(newFullList);
+
+    // 4. TRIGGER TOAST HERE
+    showToast.info("Order updated", {
+      duration: 2000, // Optional: Duration in ms
+    });
+
+    // 4. Prepare updates for Supabase
+    // We assign positions in increments of 1000 to allow future insertions
+    const updates = newActiveTodos.map((t, index) => ({
+        id: t.id,
+        position: index * 1000, 
+    }));
+
+    // 5. Send to Supabase (using the RPC function we created earlier)
+    const { error } = await supabase.rpc('update_todo_positions', { updates });
+    
+    if (error) {
+        console.error("Failed to save order:", error);
+        showToast.error("Failed to save new order");
+    }
+  };  
 
   if (loading) return <TodoSkeleton />;
 
@@ -126,7 +171,9 @@ const TodosPage = () => {
 
         <TodoList
           todos={todos}
+          setTodos={setTodos}
           onToggle={toggleTodo}
+          onReorder={handleReorder}
           onDelete={deleteTodo}
           onEdit={setEditingTodo}
           formatTime={formatTime}

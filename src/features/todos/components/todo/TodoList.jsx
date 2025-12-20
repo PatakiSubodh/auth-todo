@@ -13,7 +13,8 @@ import {
 
 const STATUSES = ["All", "Pending", "In Progress", "Completed", "Deleted"];
 
-const TodoList = ({ todos, onToggle, onDelete, onEdit, formatTime }) => {
+// 1. ADD onReorder HERE 
+const TodoList = ({ todos, setTodos, onReorder, onToggle, onDelete, onEdit, formatTime }) => {
     const [showCompleted, setShowCompleted] = useState(false);
     const [searchQuery, setSearchQuery] = useState("");
     const [priorityFilter, setPriorityFilter] = useState("All");
@@ -43,7 +44,7 @@ const TodoList = ({ todos, onToggle, onDelete, onEdit, formatTime }) => {
             if (sortOrder === "alpha") {
                 return a.title.localeCompare(b.title);
             }
-            return new Date(a.created_at) - new Date(b.created_at);
+            return 0; 
         });
 
     const activeTodos = filteredTodos.filter((t) => !t.is_complete);
@@ -59,7 +60,6 @@ const TodoList = ({ todos, onToggle, onDelete, onEdit, formatTime }) => {
 
     return (
         <div className="w-[95vw] mx-auto mt-6 mb-6">
-            {/* Mobile / Tablet */}
             <div className="grid gap-3 mb-4 grid-cols-1 sm:grid-cols-[180px_1fr] lg:hidden">
                 <Select value={statusFilter} onValueChange={setStatusFilter}>
                     <SelectTrigger className="w-full">
@@ -86,7 +86,6 @@ const TodoList = ({ todos, onToggle, onDelete, onEdit, formatTime }) => {
                 />
             </div>
 
-            {/* Desktop */}
             <div className="grid gap-6 grid-cols-1 lg:grid-cols-[240px_1fr]">
                 <div className="hidden lg:block">
                     <StatusFilter
@@ -115,6 +114,8 @@ const TodoList = ({ todos, onToggle, onDelete, onEdit, formatTime }) => {
                         completedTodos={completedTodos}
                         showCompleted={showCompleted}
                         setShowCompleted={setShowCompleted}
+                        setTodos={setTodos}
+                        onReorder={onReorder} 
                         handlers={{
                             onToggle,
                             onDelete,
