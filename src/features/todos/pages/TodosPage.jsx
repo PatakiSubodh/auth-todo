@@ -152,10 +152,10 @@ const TodosPage = () => {
   if (loading) return <TodoSkeleton />;
 
   return (
-    <div className="min-h-screen bg-white dark:bg-black transition-colors duration-300">
+    <div className="absolute min-h-screen bg-white dark:bg-black transition-colors duration-300">
       <TodoHeader onLogout={handleLogout} />
 
-      <main className="p-6 text-black dark:text-white">
+      <main className="p-6 text-black dark:text-white pt-20 max-w-3xl mx-auto space-y-6">
         <TodoForm
           editingTodo={editingTodo}
           onCreate={addTodo}
