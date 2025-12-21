@@ -26,7 +26,7 @@ const TodoSection = ({
     showCompleted,
     setShowCompleted,
     handlers,
-    onReorder, // <--- 1. Destructure it here (It comes from TodoList)
+    onReorder, 
 }) => {
     const isGrid = view === "grid";
 
@@ -49,17 +49,39 @@ const TodoSection = ({
 
     const handleDragEnd = (event) => {
         const { active, over } = event;
+        if (!over || active.id === over.id) return;
 
-        if (active.id !== over.id) {
-            const oldIndex = activeTodos.findIndex((t) => t.id === active.id);
-            const newIndex = activeTodos.findIndex((t) => t.id === over.id);
+        const activeIndex = activeTodos.findIndex(t => t.id === active.id);
+        const completedIndex = completedTodos.findIndex(t => t.id === active.id);
 
-            const newActiveOrder = arrayMove(activeTodos, oldIndex, newIndex);
+        // Dragging inside ACTIVE todos
+        if (activeIndex !== -1) {
+            const newIndex = activeTodos.findIndex(t => t.id === over.id);
+            if (newIndex === -1) return;
 
-            // 2. Use it directly here (NOT handlers.onReorder)
-            onReorder(newActiveOrder); 
+            onReorder(
+            arrayMove(activeTodos, activeIndex, newIndex),
+            completedTodos
+            );
+        }
+
+        // Dragging inside COMPLETED todos
+        if (completedIndex !== -1) {
+            const newIndex = completedTodos.findIndex(t => t.id === over.id);
+            if (newIndex === -1) return;
+
+            onReorder(
+            activeTodos,
+            arrayMove(completedTodos, completedIndex, newIndex)
+            );
         }
     };
+
+
+    const layoutClass = isGrid
+    ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
+    : "flex flex-col gap-4";
+
 
     return (
         <DndContext
@@ -95,12 +117,23 @@ const TodoSection = ({
             />
 
             {showCompleted && (
-                <ul className="mt-4 flex flex-col gap-4 opacity-80">
+                <SortableContext
+                    items={completedTodos.map(t => t.id)}
+                    strategy={isGrid ? rectSortingStrategy : verticalListSortingStrategy}
+                >
+                    <ul className={`mt-4 opacity-80 ${layoutClass}`}>
                     {completedTodos.map((todo) => (
-                        <TodoItem key={todo.id} todo={todo} {...handlers} />
+                        <SortableTodoItem
+                        key={todo.id}
+                        todo={todo}
+                        {...handlers}
+                        />
                     ))}
-                </ul>
+                    </ul>
+                </SortableContext>
             )}
+
+
         </DndContext>
     );
 };

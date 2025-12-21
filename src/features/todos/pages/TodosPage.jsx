@@ -113,41 +113,52 @@ const TodosPage = () => {
           return (a.position || 0) - (b.position || 0);
       }
 
-      // 4. If both are COMPLETED, keep sorting by Date (Newest first)
+      // 4. If both are COMPLETED, sort by position if available
+      if (a.position !== null && b.position !== null) {
+        return a.position - b.position;
+      }
+
       return new Date(b.created_at) - new Date(a.created_at);
     });
   };
 
-  const handleReorder = async (newActiveTodos) => {
-    // 1. Get the items that were NOT part of the drag (Completed or Deleted)
-    const otherTodos = todos.filter(t => t.is_complete || t.is_deleted);
-    
-    // 2. Combine: Put new active order first, then the others
-    const newFullList = [...newActiveTodos, ...otherTodos];
+  const handleReorder = async (newActiveTodos, newCompletedTodos) => {
+    // 1. Deleted todos stay untouched
+    const deletedTodos = todos.filter(t => t.is_deleted);
 
-    // 3. Update UI immediately
+    // 2. Rebuild full list
+    const newFullList = [
+      ...newActiveTodos,
+      ...newCompletedTodos,
+      ...deletedTodos,
+    ];
+
+    // 3. Update UI instantly
     setTodos(newFullList);
 
-    // 4. TRIGGER TOAST HERE
-    showToast.info("Order updated", {
-      duration: 2000, // Optional: Duration in ms
-    });
+    showToast.info("Order updated");
 
-    // 4. Prepare updates for Supabase
-    // We assign positions in increments of 1000 to allow future insertions
-    const updates = newActiveTodos.map((t, index) => ({
+    // 4. Prepare position updates (both lists)
+    const updates = [
+      ...newActiveTodos.map((t, i) => ({
         id: t.id,
-        position: index * 1000, 
-    }));
+        position: i * 1000,
+      })),
+      ...newCompletedTodos.map((t, i) => ({
+        id: t.id,
+        position: i * 1000,
+      })),
+    ];
 
-    // 5. Send to Supabase (using the RPC function we created earlier)
-    const { error } = await supabase.rpc('update_todo_positions', { updates });
-    
+    // 5. Persist to Supabase
+    const { error } = await supabase.rpc("update_todo_positions", { updates });
+
     if (error) {
-        console.error("Failed to save order:", error);
-        showToast.error("Failed to save new order");
+      console.error(error);
+      showToast.error("Failed to save order");
     }
-  };  
+  };
+
 
   if (loading) return <TodoSkeleton />;
 

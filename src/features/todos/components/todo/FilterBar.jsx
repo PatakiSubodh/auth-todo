@@ -15,6 +15,9 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 import { ViewToggle } from "./ViewToggle";
+import { Kbd } from "@/components/ui/kbd";
+import { Input } from "@/components/ui/input";
+import { useRef, useEffect } from "react";
 
 const priorityStyles = {
     High: "border-red-300 text-red-700",
@@ -32,8 +35,27 @@ const FilterBar = ({
     view,
     setView,
 }) => {
-    const hasActiveFilters =
-        sortOrder !== "date" || priorityFilter !== "All";
+
+    const inputRef = useRef(null);
+
+    useEffect(() => {
+        const handleKeyDown = (e) => {
+            if (e.ctrlKey && e.key.toLowerCase() === "k") {
+                e.preventDefault(); // stop browser search
+                inputRef.current?.focus();
+                inputRef.current?.select();
+            }
+        };
+
+        window.addEventListener("keydown", handleKeyDown);
+
+        return () => {
+            window.removeEventListener("keydown", handleKeyDown);
+        };
+    }, []);
+
+
+    const hasActiveFilters = sortOrder !== "date" || priorityFilter !== "All";
 
     const clearFilters = () => {
         setSortOrder("date");
@@ -43,19 +65,31 @@ const FilterBar = ({
     return (
         <div className="ml-auto mb-4 flex items-center gap-3 max-w-xl w-full justify-end">
             {/* Search */}
+            {/* NEW SEARCH BAR WITH CMD SHORTCUT */}
             <div className="relative w-64">
-                <Search
-                    size={16}
-                    className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
-                />
-                <input
+                {/* Left Icon */}
+                <div className="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-500">
+                    <Search size={16} />
+                </div>
+
+                {/* The Input */}
+                <Input
+                    ref={inputRef}
                     type="text"
                     placeholder="Search tasks..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full border rounded pl-9 pr-3 py-2 text-sm
-                    focus:outline-none focus:ring focus:ring-blue-200 dark:text-black"
+                    // pl-9 gives space for Search Icon, pr-12 gives space for Cmd+K
+                    className="pl-9 pr-14 bg-white dark:bg-black" 
                 />
+
+                {/* Right Shortcut Badge */}
+                <div className="absolute right-2.5 top-1/2 -translate-y-1/2 flex gap-1">
+                    <Kbd>
+                        <span className="text-xs">⌘</span>
+                    </Kbd>
+                    <Kbd>K</Kbd>
+                </div>
             </div>
 
             <ViewToggle value={view} onChange={setView} />
